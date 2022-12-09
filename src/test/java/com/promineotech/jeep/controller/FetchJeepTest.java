@@ -46,9 +46,8 @@ class FetchJeepTest {
 		System.out.println(uri);
 
 		// When: a connection is made to the URI
-		ResponseEntity<List<Jeep>> response = restTemplate.exchange(uri, HttpMethod.GET, null,
-				new ParameterizedTypeReference<>() {
-				});
+		ResponseEntity<List<Jeep>> response = restTemplate.exchange(
+				uri, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
 
 		// Then: a success (OK - 200) status code is returned
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
