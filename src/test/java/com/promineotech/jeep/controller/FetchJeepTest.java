@@ -36,7 +36,7 @@ class FetchJeepTest {
 	@Autowired
 	  private TestRestTemplate restTemplate;
 	  
-	  @LocalServerPort
+	@LocalServerPort
 	  private int serverPort;
 	
 	@Test
