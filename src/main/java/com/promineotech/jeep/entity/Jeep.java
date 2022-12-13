@@ -20,4 +20,5 @@ public class Jeep {
   private int wheelSize;
   private BigDecimal basePrice;
 
+  
 }
