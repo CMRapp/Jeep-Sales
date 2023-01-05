@@ -108,7 +108,7 @@ public class GlobalErrorHandler {
 			log.error("Exception: {}", e.toString());
 		}
 		else {
-			log.error("Exception: {}", e);
+			log.error("Exception:", e);
 		}
 				
 		return error;
