@@ -15,7 +15,7 @@ import com.promineotech.jeep.entity.Tire;
 
 public interface JeepOrderDao {
 
-	Optional<Customer> fetchCustomer(String customer);
+	Optional<Customer> fetchCustomer(String customerId);
 
 	Optional<Jeep> fetchModel(JeepModel model, String trim, int doors);
 

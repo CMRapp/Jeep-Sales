@@ -14,7 +14,7 @@ public class CreateOrderTestSupport extends BaseTest {
 			+ " \"trim\":\"Sport Altitude\",\n"
 			+ " \"doors\":4,\n"
 			+ " \"color\":\"EXT_NACHO\",\n"
-			+ " \"engine\":\"2_0_TURBI\",\n"
+			+ " \"engine\":\"2_0_TURBO\",\n"
 			+ " \"tire\":\"35_TOYO\",\n"
 			+ " \"options\":[\n"
 			+ "   \"DOOR_QUAD_4\",\n"

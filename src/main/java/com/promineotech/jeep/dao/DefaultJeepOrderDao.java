@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.promineotech.jeep.entity.Color;
 import com.promineotech.jeep.entity.Customer;
 import com.promineotech.jeep.entity.Engine;
+import com.promineotech.jeep.entity.FuelType;
 import com.promineotech.jeep.entity.Jeep;
 import com.promineotech.jeep.entity.JeepModel;
 import com.promineotech.jeep.entity.Option;
@@ -61,6 +61,40 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 	
 	/**
 	 * 
+	 * @param customer
+	 * @param jeep
+	 * @param color
+	 * @param engine
+	 * @param tire
+	 * @param price
+	 * @return
+	 */
+	private SqlParams generateInsertSql(Customer customer, Jeep jeep, Color color, Engine engine, Tire tire,
+			BigDecimal price) {
+		
+		// @formatter: off
+		String sql = ""
+			+ "INSERT INTO orders ("
+			+ "customer_fk, color_fk, engine_fk, tire_fk, model_fk, price"
+			+ ") VALUES ("
+			+ ":customer_fk, :color_fk, :engine_fk, :tire_fk, :model_fk, :price"
+			+ ")";
+		// @formatter: on
+		
+		SqlParams params = new SqlParams();
+		params.sql = sql;
+		params.source.addValue("customer_fk", customer.getCustomerPK());
+		params.source.addValue("color_fk", color.getColorPK());
+		params.source.addValue("engine_fk", engine.getEnginePK());
+		params.source.addValue("tire_fk",tire.getTirePK());
+		params.source.addValue("model_fk", jeep.getModelPK());
+		params.source.addValue("price", price);
+				
+		return params;
+	}
+	
+	/**
+	 * 
 	 * @param options
 	 * @param orderPk
 	 */
@@ -83,7 +117,7 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 		
 		// @formatter:off
 		params.sql = ""
-			+ "INSERT INTO orser_options ("
+			+ "INSERT INTO order_options ("
 			+ "option_fk, order_fk"
 			+") VALUES ("
 			+ ":option_fk, :order_fk"
@@ -96,40 +130,7 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 		return params;
 	}
 
-	/**
-	 * 
-	 * @param customer
-	 * @param jeep
-	 * @param color
-	 * @param engine
-	 * @param tire
-	 * @param price
-	 * @return
-	 */
-	private SqlParams generateInsertSql(Customer customer, Jeep jeep, Color color, Engine engine, Tire tire,
-			BigDecimal price) {
-		
-		// @formatter: off
-		String sql = ""
-			+ "INSERT INTO orders ("
-			+ "customer_fx, color_fk, engine_fk, tire_fk, model_fk, price"
-			+ ") VALUES ("
-			+ ":customer_fx, :color_fk, :engine_fk, :tire_fk, :model_fk, :price"
-			+ ")";
-		// @formatter: on
-		
-		SqlParams params = new SqlParams();
-		params.sql = sql;
-		params.source.addValue("customer_fk", customer.getCustomerPK());
-		params.source.addValue("color_fk", color.getColorPK());
-		params.source.addValue("engine_fk", engine.getEnginePK());
-		params.source.addValue("tire_fk",tire.getTirePK());
-		params.source.addValue("model_fk", jeep.getModelPK());
-		params.source.addValue("price", price);
-				
-		return params;
-	}
-
+	
 	@Override
 	public List<Option> fetchOptions(List<String> optionIds) {
 		if(optionIds.isEmpty()) {
@@ -142,8 +143,8 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 		// @formatter: off
 		String sql = ""
 			+ "SELECT * "
-			+ "FROM options"
-			+ "WHERE option_id IN(";
+			+ "FROM options "
+			+ "WHERE option_id IN (";
 		// @formatter:on		
 		
 		for (int index = 0; index < optionIds.size(); index++) {
@@ -252,7 +253,7 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 		String sql = ""
 			+ "SELECT * "
 			+ "FROM tires "
-			+ "WHERE tiree_id = :tire_id ";
+			+ "WHERE tire_id = :tire_id ";
 		// @formatter:on
 		
 		Map<String,Object> params = new HashMap<>();
@@ -265,8 +266,9 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 
 		@Override
 		public Tire extractData(ResultSet rs)
-			throws SQLException, DataAccessException {
+			throws SQLException {
 			rs.next();
+			
 			
 			// @formatter:off
 			return Tire.builder()
@@ -284,7 +286,7 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 	class EngineResultSetExtractor implements ResultSetExtractor<Engine>{
 
 		@Override
-		public Engine extractData(ResultSet rs) throws SQLException, DataAccessException {
+		public Engine extractData(ResultSet rs) throws SQLException{
 			rs.next();
 			
 			// @formatter:off
@@ -294,7 +296,7 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 				.enginePK(rs.getLong("engine_pk"))
 				.sizeInLiters(rs.getFloat("size_in_liters"))
 				.name(rs.getString("name"))
-				//.fuelType(rs.getString("fuel_type"))
+				.fuelType(FuelType.valueOf(rs.getString("fuel_type")))
 				.mpgCity(rs.getFloat("mpg_city"))
 				.mpgHwy(rs.getFloat("mpg_hwy"))
 				.hasStartStop(rs.getBoolean("has_start_stop"))
@@ -308,7 +310,7 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 	class ColorResultSetExtractor implements ResultSetExtractor<Color>{
 
 		@Override
-		public Color extractData(ResultSet rs) throws SQLException, DataAccessException {
+		public Color extractData(ResultSet rs) throws SQLException{
 			rs.next();
 			
 			// @formatter:off
@@ -327,7 +329,7 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 
 		@Override
 		public Customer extractData(ResultSet rs)
-			throws SQLException, DataAccessException {
+			throws SQLException {
 			rs.next();
 			
 			// @formatter:off
@@ -346,12 +348,13 @@ public class DefaultJeepOrderDao implements JeepOrderDao {
 
 		@Override
 		public Jeep extractData(ResultSet rs)
-			throws SQLException, DataAccessException {
+			throws SQLException {
 			rs.next();
 			
 			// @formatter:off
 			return Jeep.builder()
 				.modelPK(rs.getLong("model_pk"))
+				.modelId(JeepModel.valueOf(rs.getString("model_id")))
 				.trimLevel(rs.getString("trim_level"))
 				.numDoors(rs.getInt("num_doors"))
 				.wheelSize(rs.getInt("wheel_size"))
