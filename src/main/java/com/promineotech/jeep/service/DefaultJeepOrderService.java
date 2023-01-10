@@ -29,7 +29,7 @@ public class DefaultJeepOrderService implements JeepOrderService {
 	public Order createOrder(OrderRequest orderRequest) {
 		Customer customer = getCustomer(orderRequest);		
 		Jeep jeep = getModel(orderRequest);		
-		Color color = getColor(orderRequest);		
+		Color color = getColor(orderRequest);	
 		Engine engine = getEngine(orderRequest);		
 		Tire tire = getTire(orderRequest);
 		
